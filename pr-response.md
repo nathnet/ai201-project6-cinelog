@@ -8,8 +8,8 @@
 **How I verified:** I checked with search functionality on `save_to_watchlist` again and found no match. Then, I started `FLASK_APP=app:create_app flask run` up with no compile error. I also added test cases for watchlist and ran `pytest tests/ -v` with all green. I called POST `/watchlist/1/add` to check the call still works.
 
 ## Comment 2 — Deduplication
-**What I did:**
-**How I verified:**
+**What I did:** I looked at `add_to_collection` and created a a new error `AlreadyInWatchlistError` to be raised when the film is found to exist in the user's watchlist already. This error is separated from the collection error to provide clear separation and clarity on collection vs watchlist being different.
+**How I verified:** I started up the app with `FLASK_APP=app:create_app flask run` with no compile error, made the same POST call `/watchlist/1/add` with `{"film_id": "2"}` as the previous call and confirmed `services.watchlist_service.AlreadyInWatchlistError: Film '1' is already in this user's watchlist` is present in server log.
 
 ## Comment 3 — Missing test
 **What I did:**
