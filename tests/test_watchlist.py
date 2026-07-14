@@ -121,23 +121,31 @@ def test_add_to_watchlist_private_flag_is_stored(app, sample_user, sample_film):
 
 # ── get_watchlist ────────────────────────────────────────────────────────────
 
-def test_get_watchlist_returns_alphabetically(app, sample_user):
+def test_get_watchlist_returns_newest_first(app, sample_user):
     """
-    get_watchlist() should return films sorted alphabetically by title
-    (A to Z).
+    get_watchlist() should return films sorted by date_added descending
+    (most recently added first).
     """
     with app.app_context():
+        from datetime import datetime, timezone, timedelta
+
         film_z = Film(title="Zootopia", year=2016, genre="Animation")
         film_a = Film(title="Alien", year=1979, genre="Horror")
         db.session.add_all([film_z, film_a])
         db.session.commit()
 
-        add_to_watchlist(user_id=sample_user, film_id=film_z.id)
-        add_to_watchlist(user_id=sample_user, film_id=film_a.id)
+        earlier = datetime.now(timezone.utc) - timedelta(days=5)
+        later = datetime.now(timezone.utc)
+
+        entry_z = WatchlistEntry(user_id=sample_user, film_id=film_z.id, date_added=earlier)
+        entry_a = WatchlistEntry(user_id=sample_user, film_id=film_a.id, date_added=later)
+        db.session.add_all([entry_z, entry_a])
+        db.session.commit()
 
         watchlist = get_watchlist(sample_user)
         titles = [f["title"] for f in watchlist]
 
+        # Alien was added more recently, so it should come first
         assert titles[0] == "Alien"
         assert titles[1] == "Zootopia"
 
