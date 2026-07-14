@@ -26,6 +26,12 @@ I used Claude (Claude Code) throughout this project in several ways:
 **What I did:** I accidentally added the tests that cover the watchlist prior to the rename fix commit. I referenced tests in the existing `./tests/test_collection.py` for the code pattern and applied to all test cases in `watchlist_service.py`
 **How I verified:** I ran `pytest tests/ -v` and confirmed tests passed with 100% with all new tests visibly added.
 
+## Stretch — Second Test
+
+**Edge case chosen:** `test_add_to_watchlist_private_flag_is_stored` — verifies that explicitly passing `public=False` stores the entry as private.
+
+**Why I chose it:** The visibility flag is the watchlist's most important optional parameter. If `add_to_watchlist` silently ignored the caller's value and always fell back to the default, users who tried to keep their list private would have no way to know it wasn't working. Explicitly asserting that `entry.public is False` closes that gap.
+
 ## Comment 4 — Default visibility
 **My position:** I decided to set the default visibility for a user's watchlist to be public, unless specified.
 **Reasoning:** The platform is a community app for users to share films they have watched, their ratings, and what they want to watch. By setting default visibility to public, the user's watchlist is immediately discoverable by fellow CineLoggers. If the user prefers to keep the list private, they can manually set their list to private.
