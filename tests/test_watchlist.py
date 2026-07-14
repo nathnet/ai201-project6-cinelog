@@ -11,6 +11,7 @@ from services.watchlist_service import (
     add_to_watchlist,
     get_watchlist,
     FilmNotFoundError,
+    AlreadyInWatchlistError,
 )
 
 
@@ -48,6 +49,9 @@ def sample_film(app):
 # ── Basic add ───────────────────────────────────────────────────────────────
 
 def test_add_to_watchlist_creates_entry(app, sample_user, sample_film):
+    """
+    Adding a valid film should create a WatchlistEntry in the database.
+    """
     with app.app_context():
         entry = add_to_watchlist(user_id=sample_user, film_id=sample_film)
 
@@ -61,9 +65,32 @@ def test_add_to_watchlist_creates_entry(app, sample_user, sample_film):
         assert in_db is not None
 
 
+# ── Deduplication ────────────────────────────────────────────────────────────
+
+def test_add_to_watchlist_duplicate_raises(app, sample_user, sample_film):
+    """
+    Adding the same film twice should raise AlreadyInWatchlistError,
+    not silently create a duplicate entry.
+    """
+    with app.app_context():
+        add_to_watchlist(user_id=sample_user, film_id=sample_film)
+
+        with pytest.raises(AlreadyInWatchlistError):
+            add_to_watchlist(user_id=sample_user, film_id=sample_film)
+
+        count = WatchlistEntry.query.filter_by(
+            user_id=sample_user, film_id=sample_film
+        ).count()
+        assert count == 1
+
+
 # ── Nonexistent film ─────────────────────────────────────────────────────────
 
 def test_add_to_watchlist_nonexistent_film_raises(app, sample_user):
+    """
+    Adding a film_id that doesn't exist in the database should raise
+    FilmNotFoundError, not a database integrity error.
+    """
     with app.app_context():
         fake_film_id = "00000000-0000-0000-0000-000000000000"
 
@@ -73,6 +100,10 @@ def test_add_to_watchlist_nonexistent_film_raises(app, sample_user):
 # ── get_watchlist ────────────────────────────────────────────────────────────
 
 def test_get_watchlist_returns_alphabetically(app, sample_user):
+    """
+    get_watchlist() should return films sorted alphabetically by title
+    (A to Z).
+    """
     with app.app_context():
         film_z = Film(title="Zootopia", year=2016, genre="Animation")
         film_a = Film(title="Alien", year=1979, genre="Horror")
@@ -90,6 +121,10 @@ def test_get_watchlist_returns_alphabetically(app, sample_user):
 
 
 def test_get_watchlist_empty(app, sample_user):
+    """
+    get_watchlist() should return an empty list for a user with no
+    watchlist entries, not raise an error.
+    """
     with app.app_context():
         result = get_watchlist(sample_user)
         assert result == []

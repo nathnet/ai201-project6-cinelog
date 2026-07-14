@@ -12,8 +12,8 @@
 **How I verified:** I started up the app with `FLASK_APP=app:create_app flask run` with no compile error, made the same POST call `/watchlist/1/add` with `{"film_id": "2"}` as the previous call and confirmed `services.watchlist_service.AlreadyInWatchlistError: Film '1' is already in this user's watchlist` is present in server log.
 
 ## Comment 3 — Missing test
-**What I did:**
-**How I verified:**
+**What I did:** I accidentally added the tests that cover the watchlist prior to the rename fix commit. I referenced tests in the existing `./tests/test_collection.py` for the code pattern and applied to all test cases in `watchlist_service.py`
+**How I verified:** I ran `pytest tests/ -v` and confirmed tests passed with 100% with all new tests visibly added.
 
 ## Comment 4 — Default visibility
 **My position:**
