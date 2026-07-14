@@ -21,9 +21,9 @@
 **Tradeoff acknowledged:** With this decision, the user would need to take an extra step to manually set watchlist's private visibility. This reduces privacy, but I believe that this would provide them a better discovery and sense of control rather than having dead-on-arrival discoverability if users never set their visibility to public if default is private.
 
 ## Comment 5 — Sort order
-**My position:**
-**Reasoning:**
-**Engagement with reviewer's point:**
+**My position:** I agree that most recently added film is more relevant than the title order.
+**Reasoning:** The most recently added film indicates that it has recently caught the attention of the user, which also indicates the most up-to-date genre interests. The older added film could also be an outdated interest that the user once wanted to watch, but not anymore. If ordered by alphabetical order, it would be helpful with finding title based on the name, but it does not provide as much context catered to user's current interests. 
+**Engagement with reviewer's point:** I can agree with the reviewer on this point that the most recently added film corresponds more to user's recent interests in film. This would help the user navigate through their list and find what to watch next faster and it is contextually more informative than providing a list ordered by name. The tradeoff is that date-added order makes it harder to scan a large list by name, but for a watchlist whose primary purpose is deciding what to watch next, recency is more useful than alphabetical position.
 
 ## Comment 6 — Rebase
 **What conflicted:**
