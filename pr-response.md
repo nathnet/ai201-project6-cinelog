@@ -1,7 +1,18 @@
 # PR Response Doc — CineLog Watchlist Feature
 
 ## AI Usage
-<!-- Fill in at the end — how you used AI tools during this project -->
+
+I used Claude (Claude Code) throughout this project in several ways:
+
+**Codebase orientation.** I asked AI to summarize `models.py` and explain the test patterns in `test_collection.py` before reading the review comments. This helped me understand the naming conventions, how deduplication was handled in `add_to_collection`, and what fixture structure the tests expected — which made Comments 1–3 much clearer.
+
+**Test scaffolding.** I asked AI to generate `tests/test_watchlist.py` following the same fixture and assertion structure as `test_collection.py`. I reviewed the output, caught issues (a missing `film` relationship on `WatchlistEntry`, wrong column type for `fake_film_id`), and fixed them. I also directed which tests to add and what behavior to assert.
+
+**Stress-testing design arguments (Comments 4 and 5).** After drafting my initial responses, I asked AI what counterarguments a reviewer might raise. For Comment 4, AI surfaced that CineLog is a community app and private-by-default works against its core purpose — which led me to reverse my position to public-by-default. For Comment 5, AI flagged that alphabetical order is easier to scan for large lists, which I incorporated as the tradeoff acknowledgement. The final arguments are my own reasoning, shaped by engaging with those counterpoints.
+
+**Git debugging.** I used AI to diagnose why `git rebase origin/main` completed without conflict markers — it identified that `WatchlistEntry` was in the common ancestor rather than added by a feature branch commit, so git had nothing to replay when main deleted it.
+
+**Commit message audit.** I ran my `git log --oneline` output through AI to check conventional commit format compliance before the final rebase.
 
 ## Comment 1 — Rename
 **What I did:** I looked up `save_to_watchlist`'s callsites using VS Code's `Find All References` and doubled check with search functionality. Then I renamed to function to `add_to_watchlist` and also traced the other references and renamed them as well.
@@ -31,4 +42,29 @@
 **How I verified no conflict remains:** I ran the Flask app with no errors and confirmed all endpoints respond correctly. Ran `pytest tests/ -v` with 100% passing rate.
 
 ## PR Description
-<!-- Written at the end — feature overview, design decisions, manual testing steps -->
+
+This PR adds a watchlist feature to CineLog — a way for users to save films they want to watch later, separate from their collection of films they've already seen. Users can add films to their watchlist, optionally set visibility, and retrieve their list sorted by most recently added.
+
+**Design decisions:**
+
+- **Default visibility: public.** Since CineLog is a community app, watchlists default to public so they're immediately discoverable by other users. Users who prefer privacy can explicitly pass `"public": false` when adding a film.
+- **Sort order: most recently added first.** A recently added film is more likely to reflect what a user actually wants to watch right now. Alphabetical order is easier to scan by name, but for a watchlist's primary purpose — deciding what to watch next — recency is more useful.
+
+**How to test manually:**
+
+1. Start the app: `FLASK_APP=app:create_app flask run`
+2. Seed the database: `py seed.py` — note a user ID and a film ID from the output
+3. Add a film to the watchlist:
+   ```
+   POST /watchlist/<user_id>/add
+   Body: { "film_id": "<film_id>" }
+   ```
+4. Confirm the entry is returned:
+   ```
+   GET /watchlist/<user_id>
+   ```
+5. Try adding the same film again — confirm a `409` or error response (deduplication)
+6. Add a private entry by passing `"public": false` in the request body, confirm `public` field in response
+7. Add multiple films and confirm the list is sorted by most recently added
+
+![Git commit logs](commits.png)
