@@ -26,9 +26,9 @@
 **Engagement with reviewer's point:** I can agree with the reviewer on this point that the most recently added film corresponds more to user's recent interests in film. This would help the user navigate through their list and find what to watch next faster and it is contextually more informative than providing a list ordered by name. The tradeoff is that date-added order makes it harder to scan a large list by name, but for a watchlist whose primary purpose is deciding what to watch next, recency is more useful than alphabetical position.
 
 ## Comment 6 — Rebase
-**What conflicted:**
-**How I resolved it:**
-**How I verified no conflict remains:**
+**What conflicted:** The UUID refactor commit on `main` deleted `WatchlistEntry` from `models.py` entirely, since it was not part of `main`. Because `WatchlistEntry` was already present in the common ancestor rather than added by a feature branch commit, git had nothing to replay and silently dropped it during the rebase.
+**How I resolved it:** After the rebase completed, I manually re-added `WatchlistEntry` to `models.py` with `film_id = db.Column(db.String(36), ...)` to match the UUID type now used by `Film.id`, then folded that fix into the original watchlist model commit using `git rebase -i`.
+**How I verified no conflict remains:** I ran the Flask app with no errors and confirmed all endpoints respond correctly. Ran `pytest tests/ -v` with 100% passing rate.
 
 ## PR Description
 <!-- Written at the end — feature overview, design decisions, manual testing steps -->
