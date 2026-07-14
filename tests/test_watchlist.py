@@ -97,6 +97,28 @@ def test_add_to_watchlist_nonexistent_film_raises(app, sample_user):
         with pytest.raises(FilmNotFoundError):
             add_to_watchlist(user_id=sample_user, film_id=fake_film_id)
 
+# ── Visibility ───────────────────────────────────────────────────────────────
+
+def test_add_to_watchlist_defaults_to_public(app, sample_user, sample_film):
+    """
+    When public is not provided, the entry should default to public
+    (public=True).
+    """
+    with app.app_context():
+        entry = add_to_watchlist(user_id=sample_user, film_id=sample_film)
+        assert entry.public is True
+
+
+def test_add_to_watchlist_private_flag_is_stored(app, sample_user, sample_film):
+    """
+    When public=False is explicitly passed, the entry should be stored
+    as private.
+    """
+    with app.app_context():
+        entry = add_to_watchlist(user_id=sample_user, film_id=sample_film, public=False)
+        assert entry.public is False
+
+
 # ── get_watchlist ────────────────────────────────────────────────────────────
 
 def test_get_watchlist_returns_alphabetically(app, sample_user):

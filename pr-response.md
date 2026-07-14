@@ -16,9 +16,9 @@
 **How I verified:** I ran `pytest tests/ -v` and confirmed tests passed with 100% with all new tests visibly added.
 
 ## Comment 4 — Default visibility
-**My position:**
-**Reasoning:**
-**Tradeoff acknowledged:**
+**My position:** I decided to set the default visibility for a user's watchlist to be public, unless specified.
+**Reasoning:** The platform is a community app for users to share films they have watched, their ratings, and what they want to watch. By setting default visibility to public, the user's watchlist is immediately discoverable by fellow CineLoggers. If the user prefers to keep the list private, they can manually set their list to private.
+**Tradeoff acknowledged:** With this decision, the user would need to take an extra step to manually set watchlist's private visibility. This reduces privacy, but I believe that this would provide them a better discovery and sense of control rather than having dead-on-arrival discoverability if users never set their visibility to public if default is private.
 
 ## Comment 5 — Sort order
 **My position:**

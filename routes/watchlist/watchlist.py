@@ -28,6 +28,9 @@ def add_film(user_id):
     data = request.get_json()
     if not data or "film_id" not in data:
         return jsonify({"error": "film_id is required"}), 400
+    public = data.get("public")
 
-    entry = add_to_watchlist(user_id=user_id, film_id=data["film_id"])
+    entry = add_to_watchlist(
+        user_id=user_id, film_id=data["film_id"], public=public
+    )
     return jsonify(entry.to_dict()), 201
